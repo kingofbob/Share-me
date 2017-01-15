@@ -1,0 +1,8 @@
+<resources>
+    <string name="app_name">Share me!</string>
+    <string name="press_again_exit">Press again to exit</string>
+    <string name="share_this">Share This!</string>
+
+    <string name="permission">Permission</string>
+    <string name="permission2">This app required access to your photos in order to work.</string>
+</resources>
