@@ -87,10 +87,10 @@ public class GalleryImageAdapter extends BaseAdapter {
         File imageFile = new File(galleryImageObject.getUri());
         Picasso.with(context)
                 .load(imageFile)
-//                .placeholder()
+                .placeholder(R.drawable.placeholder)
 //                .error()
                 .noFade()
-                .resize(150, 150)
+                .resize(250, 250)
                 .transform(new RoundedTransformation(5, 0))
                 .centerCrop()
                 .into(viewHolder.imageView);

@@ -11,8 +11,6 @@ import android.support.v7.app.AlertDialog;
 import android.util.Log;
 import android.widget.Toast;
 
-import com.github.piasy.biv.BigImageViewer;
-import com.github.piasy.biv.loader.fresco.FrescoImageLoader;
 import com.soongwei.shareme.R;
 import com.soongwei.shareme.constants.Constants;
 import com.soongwei.shareme.fragments.MainFragment;
@@ -34,7 +32,6 @@ public class MainActivity extends SupportActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        BigImageViewer.initialize(FrescoImageLoader.with(getApplicationContext()));
 
         if (savedInstanceState == null) {
             loadRootFragment(R.id.fl_container, MainFragment.newInstance());

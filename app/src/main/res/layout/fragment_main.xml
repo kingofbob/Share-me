@@ -36,38 +36,14 @@
     </FrameLayout>
 
 
-    <LinearLayout
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:background="@color/colorPrimary"
-        android:orientation="vertical">
-
-        <View
+        <com.lhh.apst.library.AdvancedPagerSlidingTabStrip
+            android:id="@+id/tabs"
             android:layout_width="match_parent"
-            android:layout_height="4dp"
-            android:layout_gravity="center"
-            android:background="@color/colorPrimary"/>
+            android:layout_height="55dp"
+            style="@style/pagertab_style"
+            android:layout_alignParentBottom="true"
+            android:fillViewport="true" />
 
-        <com.gigamole.navigationtabstrip.NavigationTabStrip
-            android:id="@+id/tabView"
-            android:layout_width="match_parent"
-            android:layout_height="42dp"
-            android:layout_gravity="center"
-            android:layout_marginEnd="30dp"
-            android:layout_marginLeft="30dp"
-            android:layout_marginRight="30dp"
-            android:layout_marginStart="30dp"
-            app:nts_active_color="#fff"
-            app:nts_size="16sp"
-            app:nts_color="@color/colorPrimaryLight"
-            app:nts_corners_radius="3.5dp"
-            app:nts_factor="0.8"
-            app:nts_gravity="bottom"
-            app:nts_inactive_color="#81ffffff"
-            app:nts_type="point"
-            app:nts_weight="7dp"/>
-
-    </LinearLayout>
 
 
     <android.support.v4.view.ViewPager

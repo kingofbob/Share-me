@@ -3,6 +3,8 @@ package com.soongwei.shareme.Utils;
 import android.app.Activity;
 import android.content.Context;
 import android.database.Cursor;
+import android.graphics.Bitmap;
+import android.graphics.Matrix;
 import android.net.Uri;
 import android.provider.MediaStore;
 import android.util.Log;
@@ -65,7 +67,7 @@ public class ImageUtils {
                 projection, // Which columns to return
                 null,       // Which rows to return (all rows)
                 null,       // Selection arguments (none)
-                null        // Ordering
+                MediaStore.Images.ImageColumns.DATE_TAKEN + " DESC"        // Ordering
         );
 
         if ( cur != null && cur.getCount() > 0 ) {
@@ -125,6 +127,13 @@ public class ImageUtils {
         } else {
             listener.onError();
         }
+    }
+
+    public static Bitmap rotateImage(Bitmap source, float angle) {
+        Matrix matrix = new Matrix();
+        matrix.postRotate(angle);
+        return Bitmap.createBitmap(source, 0, 0, source.getWidth(), source.getHeight(),
+                matrix, true);
     }
 
 }

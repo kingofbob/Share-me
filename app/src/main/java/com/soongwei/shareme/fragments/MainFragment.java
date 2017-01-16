@@ -18,7 +18,7 @@ import android.view.ViewGroup;
 import android.widget.Toast;
 
 
-import com.gigamole.navigationtabstrip.NavigationTabStrip;
+import com.lhh.apst.library.AdvancedPagerSlidingTabStrip;
 import com.soongwei.shareme.R;
 import com.soongwei.shareme.Utils.ImageUtils;
 import com.soongwei.shareme.adapters.PhotoPagerAdapter;
@@ -42,9 +42,6 @@ import butterknife.ButterKnife;
 import me.yokeyword.fragmentation.SupportFragment;
 
 
-/**
- * Created by YoKeyword on 16/6/30.
- */
 public class MainFragment extends BaseMainFragment {
     private static final int REQ_MSG = 10;
 
@@ -54,7 +51,7 @@ public class MainFragment extends BaseMainFragment {
 
 
     @BindView(R.id.viewPager)ViewPager viewPager;
-    @BindView(R.id.tabView)NavigationTabStrip tabView;
+    @BindView(R.id.tabs)AdvancedPagerSlidingTabStrip tabView;
     @BindView(R.id.toolbar)Toolbar toolbar;
 
     private PhotoPagerAdapter adapter;
@@ -116,9 +113,6 @@ public class MainFragment extends BaseMainFragment {
                     adapter = new PhotoPagerAdapter(getChildFragmentManager());
                     adapter.setDatas(albums);
                     viewPager.setAdapter(adapter);
-
-                    tabView.setTitles(stockArr);
-
 
                     tabView.setViewPager(viewPager);
 
