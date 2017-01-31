@@ -5,4 +5,7 @@
 
     <string name="permission">Permission</string>
     <string name="permission2">This app required access to your photos in order to work.</string>
+
+    <string name="permission3">Please login to Flickr and allow access for this app to continue usage.</string>
+    <string name="check_connectivity">Please check your internet connection and try again.</string>
 </resources>

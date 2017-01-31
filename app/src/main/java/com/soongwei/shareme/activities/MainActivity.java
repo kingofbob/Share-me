@@ -9,7 +9,6 @@ import android.support.annotation.Nullable;
 import android.support.v4.app.ActivityCompat;
 import android.support.v7.app.AlertDialog;
 import android.util.Log;
-import android.widget.Toast;
 
 import com.soongwei.shareme.R;
 import com.soongwei.shareme.constants.Constants;
@@ -25,7 +24,7 @@ import me.yokeyword.fragmentation.anim.FragmentAnimator;
 import me.yokeyword.fragmentation.helper.FragmentLifecycleCallbacks;
 
 
-public class MainActivity extends SupportActivity {
+public class MainActivity extends SupportActivity{
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
@@ -94,4 +93,7 @@ public class MainActivity extends SupportActivity {
 
         return new DefaultHorizontalAnimator();
     }
+
+
+
 }

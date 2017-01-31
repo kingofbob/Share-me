@@ -57,5 +57,7 @@ dependencies {
 //    compile 'com.github.piasy:FrescoImageLoader:1.2.5'
 //    compile 'com.github.piasy:GlideImageLoader:1.2.5'
 //    compile 'com.github.piasy:ProgressPieIndicator:1.2.5'
+    compile 'com.loopj.android:android-async-http:1.4.9'
+    compile 'com.codepath.libraries:android-oauth-handler:1.1.0'
 
 }
