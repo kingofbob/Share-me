@@ -8,4 +8,7 @@
 
     <string name="permission3">Please login to Flickr and allow access for this app to continue usage.</string>
     <string name="check_connectivity">Please check your internet connection and try again.</string>
+    <string name="file_notworking">Not working for photo albums from phone.</string>
+    <string name="loading_image">Loading...</string>
+    <string name="loading">Loading...</string>
 </resources>

@@ -27,9 +27,7 @@
                 <category android:name="android.intent.category.DEFAULT" />
                 <category android:name="android.intent.category.BROWSABLE" />
 
-                <data
-                    android:host="cprest"
-                    android:scheme="oauth" />
+                <data android:scheme="flickrj-android-sample-oauth" />
             </intent-filter>
         </activity>
 

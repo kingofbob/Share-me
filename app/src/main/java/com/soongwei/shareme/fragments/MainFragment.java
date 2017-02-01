@@ -1,7 +1,9 @@
 package com.soongwei.shareme.fragments;
 
 import android.Manifest;
+import android.app.ProgressDialog;
 import android.content.pm.PackageManager;
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.app.ActivityCompat;
@@ -14,20 +16,27 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Toast;
 
+import com.googlecode.flickrjandroid.oauth.OAuthUtils;
+import com.googlecode.flickrjandroid.photos.Photo;
+import com.googlecode.flickrjandroid.photos.PhotoList;
+import com.googlecode.flickrjandroid.photosets.Photoset;
+import com.googlecode.flickrjandroid.photosets.Photosets;
 import com.lhh.apst.library.AdvancedPagerSlidingTabStrip;
 import com.loopj.android.http.JsonHttpResponseHandler;
 import com.soongwei.shareme.MyApplication;
 import com.soongwei.shareme.R;
 import com.soongwei.shareme.Utils.ImageUtils;
 import com.soongwei.shareme.Utils.StringUtils;
+import com.soongwei.shareme.activities.SplashActivity;
 import com.soongwei.shareme.adapters.PhotoPagerAdapter;
-import com.soongwei.shareme.apis.FlickrClient;
+import com.soongwei.shareme.apis.FlickrHelper;
+import com.soongwei.shareme.apis.GetOAuthTokenTask;
+import com.soongwei.shareme.apis.GetPhotosetsTask;
 import com.soongwei.shareme.base.BaseMainFragment;
 import com.soongwei.shareme.constants.Constants;
-import com.soongwei.shareme.flickrobj.PhotoSetListObject;
-import com.soongwei.shareme.flickrobj.Photoset;
 import com.soongwei.shareme.interfaces.OnPhoneImagesObtained;
 import com.soongwei.shareme.objects.PhoneAlbum;
+import com.soongwei.shareme.objects.PhonePhoto;
 import com.soongwei.shareme.objects.PhotoPermissionObject;
 
 import org.greenrobot.eventbus.EventBus;
@@ -48,14 +57,13 @@ public class MainFragment extends BaseMainFragment {
     public static final int FIRST = 0;
     public static final int SECOND = 1;
     public static final int THIRD = 2;
-
+    private ProgressDialog mProgressDialog;
 
     @BindView(R.id.viewPager)ViewPager viewPager;
     @BindView(R.id.tabs)AdvancedPagerSlidingTabStrip tabView;
     @BindView(R.id.toolbar)Toolbar toolbar;
 
     private PhotoPagerAdapter adapter;
-    private FlickrClient client;
 
     public static MainFragment newInstance() {
 
@@ -80,54 +88,20 @@ public class MainFragment extends BaseMainFragment {
         super.onActivityCreated(savedInstanceState);
 
         EventBus.getDefault().register(this);
-        client = MyApplication.getRestClient();
 
-        initViewFromPhone();
+//        initViewFromPhone();
+        displayView(new Vector<PhoneAlbum>());
         initViewFromFlickr();
+
+
     }
 
     private void initViewFromFlickr(){
-
-
-
-
-        client.getAlbumNameList(new JsonHttpResponseHandler() {
-            @Override
-            public void onSuccess(int statusCode, Header[] headers,
-                                  JSONObject json) {
-                Log.d("DEBUG", "result success: " + json.toString());
-
-                PhotoSetListObject photoSetListObject =  (PhotoSetListObject) StringUtils.convertStringToObject(json.toString(), PhotoSetListObject.class);
-
-                Log.d(MainFragment.class.getSimpleName(), "Data Name: " + photoSetListObject.getPhotosets().getPhotoset().get(0).getTitle().getContent());
-
-
-                for (Photoset photoset: photoSetListObject.getPhotosets().getPhotoset()){
-                    Log.d(MainFragment.class.getSimpleName(), "Photoset Name: " + photoset.getTitle().getContent());
-
-
-                    client.getPhotosList(new JsonHttpResponseHandler(){
-                        public void onSuccess(int statusCode, Header[] headers,
-                                              JSONObject json) {
-                            Log.d("DEBUG", "result success2: " + json.toString());
-                        }
-
-                        @Override
-                        public void onFailure(int statusCode, Header[] headers, Throwable throwable, JSONObject errorResponse) {
-                            Log.d("DEBUG", "result failure2: " + throwable.getMessage());
-                            Toast.makeText(getActivity(),R.string.check_connectivity, Toast.LENGTH_LONG).show();
-                        }
-                    });
-                }
-
-            }
-
-            @Override
-            public void onFailure(int statusCode, Header[] headers, Throwable throwable, JSONObject errorResponse) {
-                Log.d("DEBUG", "result failure: " + throwable.getMessage());
-                Toast.makeText(getActivity(),R.string.check_connectivity, Toast.LENGTH_LONG).show();
-            }
-        });
+        mProgressDialog = ProgressDialog.show(getActivity(),
+                "", getResources().getString(R.string.loading)); //$NON-NLS-1$ //$NON-NLS-2$
+        mProgressDialog.setCancelable(false);
+        GetPhotosetsTask task = new GetPhotosetsTask(getActivity());
+        task.execute(FlickrHelper.getOAuthToken(getActivity()).getUser().getId());
     }
 
     private void initViewFromPhone() {
@@ -145,6 +119,35 @@ public class MainFragment extends BaseMainFragment {
 
     }
 
+    private  Vector<PhoneAlbum> flickrDataConverter(Photosets photosets){
+        Vector<PhoneAlbum> albums = new Vector<>();
+
+        for(Photoset photoset:photosets.getPhotosets()){ //each albums
+            PhoneAlbum phoneAlbum = new PhoneAlbum();
+            phoneAlbum.setId(Long.parseLong(photoset.getId()));
+            phoneAlbum.setName(photoset.getTitle());
+            phoneAlbum.setCoverUri(FlickrHelper.imageUrlGenerator(photoset.getFarm(), photoset.getServer(), photoset.getId(), photoset.getSecret(), "{s}"));
+
+            Vector<PhonePhoto> phonePhotos = new Vector<>();
+            for (Photo photo: photoset.getPhotoList()){
+                PhonePhoto phonePhoto = new PhonePhoto();
+                phonePhoto.setId(Long.parseLong(photo.getId()));
+                phonePhoto.setAlbumName(photo.getTitle());
+                phonePhoto.setPhotoUri(FlickrHelper.imageUrlGenerator(photo.getFarm(), photo.getServer(), photo.getId(), photo.getSecret(), "{s}"));
+                phonePhoto.setPhotoOriginalUri(FlickrHelper.imageUrlGenerator(photo.getFarm(), photo.getServer(), photo.getId(), photo.getOriginalSecret(), "o"));
+                phonePhotos.add(phonePhoto);
+
+            }
+
+            phoneAlbum.setAlbumPhotos(phonePhotos);
+
+            albums.add(phoneAlbum);
+        }
+
+        return albums;
+
+    }
+
 
     private void washPhotos(){
         ImageUtils.getPhoneAlbums(getActivity(), new OnPhoneImagesObtained() {
@@ -156,19 +159,8 @@ public class MainFragment extends BaseMainFragment {
                 }
 
 
+                displayView(albums);
 
-                if (viewPager.getAdapter() == null){
-                    adapter = new PhotoPagerAdapter(getChildFragmentManager());
-                    adapter.setDatas(albums);
-                    viewPager.setAdapter(adapter);
-
-                    tabView.setViewPager(viewPager);
-
-
-                }else{
-                    adapter.setDatas(albums);
-                    adapter.notifyDataSetChanged();
-                }
 
 
             }
@@ -180,10 +172,48 @@ public class MainFragment extends BaseMainFragment {
         });
     }
 
+    private void displayView(Vector<PhoneAlbum> albums){
+        adapter = new PhotoPagerAdapter(getChildFragmentManager());
+        adapter.setDatas(albums);
+        viewPager.setAdapter(adapter);
+
+        tabView.setViewPager(viewPager);
+
+        if (mProgressDialog != null) {
+            mProgressDialog.dismiss();
+        }
+    }
+
     @Subscribe(threadMode = ThreadMode.MAIN)
     public void onMessageEvent(PhotoPermissionObject photoPermissionObject) {
         washPhotos();
     };
+
+    @Subscribe(threadMode = ThreadMode.MAIN)
+    public void onPhotosets(Photosets photosets) {
+
+        new AsyncTask<Photosets,Void,  Vector<PhoneAlbum> >(){
+            @Override
+            protected void onPreExecute() {
+                super.onPreExecute();
+            }
+
+            @Override
+            protected Vector<PhoneAlbum> doInBackground(Photosets... params) {
+                return flickrDataConverter(params[0]);
+            }
+
+            @Override
+            protected void onPostExecute(Vector<PhoneAlbum> phoneAlba) {
+                super.onPostExecute(phoneAlba);
+
+                displayView(phoneAlba);
+            }
+        }.execute(photosets);
+
+
+    };
+
 
 
     @Override

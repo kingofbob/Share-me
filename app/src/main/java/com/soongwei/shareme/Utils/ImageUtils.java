@@ -1,11 +1,13 @@
 package com.soongwei.shareme.Utils;
 
 import android.app.Activity;
+import android.app.DownloadManager;
 import android.content.Context;
 import android.database.Cursor;
 import android.graphics.Bitmap;
 import android.graphics.Matrix;
 import android.net.Uri;
+import android.os.Environment;
 import android.provider.MediaStore;
 import android.util.Log;
 
@@ -13,7 +15,10 @@ import com.soongwei.shareme.interfaces.OnPhoneImagesObtained;
 import com.soongwei.shareme.objects.PhoneAlbum;
 import com.soongwei.shareme.objects.PhonePhoto;
 
+import java.io.File;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.Vector;
 
 /**
@@ -96,7 +101,7 @@ public class ImageUtils {
                     PhonePhoto phonePhoto = new PhonePhoto();
                     phonePhoto.setAlbumName( bucketName );
                     phonePhoto.setPhotoUri( data );
-                    phonePhoto.setId( Integer.valueOf( imageId ) );
+                    phonePhoto.setId( Long.valueOf( imageId ) );
 
                     if ( albumsNames.contains( bucketName ) ) {
                         for ( PhoneAlbum album : phoneAlbums ) {
@@ -134,6 +139,30 @@ public class ImageUtils {
         matrix.postRotate(angle);
         return Bitmap.createBitmap(source, 0, 0, source.getWidth(), source.getHeight(),
                 matrix, true);
+    }
+
+    public static void file_download(Context context, String uRl) {
+        File direct = new File(Environment.getExternalStorageDirectory()
+                + "/Shareme");
+
+        if (!direct.exists()) {
+            direct.mkdirs();
+        }
+
+        DownloadManager mgr = (DownloadManager) context.getSystemService(Context.DOWNLOAD_SERVICE);
+
+        Uri downloadUri = Uri.parse(uRl);
+        DownloadManager.Request request = new DownloadManager.Request(
+                downloadUri);
+
+        request.setAllowedNetworkTypes(
+                DownloadManager.Request.NETWORK_WIFI
+                        | DownloadManager.Request.NETWORK_MOBILE)
+                .setAllowedOverRoaming(true)
+                .setDestinationInExternalPublicDir("/Shareme", "Shareme"+new SimpleDateFormat("yyyyMMddHHmmss").format(new Date())+".jpg");
+
+        mgr.enqueue(request);
+
     }
 
 }

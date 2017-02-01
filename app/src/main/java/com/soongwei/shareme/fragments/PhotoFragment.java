@@ -91,7 +91,7 @@ public class PhotoFragment extends BaseFragment {
 
         imageObjects.clear();
         for(PhonePhoto photo:phoneAlbum.getAlbumPhotos()){
-            imageObjects.add(new GalleryImageObject(photo.getId(), photo.getAlbumName(), photo.getPhotoUri(), false));
+            imageObjects.add(new GalleryImageObject(photo.getId(), photo.getAlbumName(), photo.getPhotoUri(),photo.getPhotoOriginalUri(), false));
         }
 
         if (gridView.getAdapter() == null){
@@ -102,7 +102,7 @@ public class PhotoFragment extends BaseFragment {
             gridView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
                 @Override
                 public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                    ((MainActivity)getActivity()).start(ImageViewerFragment.newInstance(0,imageObjects.get(position).getUri()));
+                    ((MainActivity)getActivity()).start(ImageViewerFragment.newInstance(0,imageObjects.get(position).getUri(),imageObjects.get(position).getUriO()));
 
                 }
             });

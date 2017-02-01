@@ -1,5 +1,7 @@
 package com.soongwei.shareme.fragments;
 
+import android.app.ProgressDialog;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
@@ -13,12 +15,17 @@ import android.view.LayoutInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import android.webkit.URLUtil;
 import android.widget.GridView;
 import android.widget.ImageView;
+import android.widget.Toast;
 
 import com.soongwei.shareme.R;
+import com.soongwei.shareme.Utils.ImageUtils;
+import com.soongwei.shareme.Utils.RoundedTransformation;
 import com.soongwei.shareme.Utils.StringUtils;
 import com.soongwei.shareme.adapters.GalleryImageAdapter;
+import com.soongwei.shareme.apis.OAuthTask;
 import com.soongwei.shareme.base.BaseBackFragment;
 import com.soongwei.shareme.base.BaseFragment;
 import com.soongwei.shareme.objects.GalleryImageObject;
@@ -51,19 +58,20 @@ public class ImageViewerFragment extends BaseBackFragment {
 
     private long id;
     private String url;
-
+    private String urlO;
     private PhotoViewAttacher mAttacher;
+    private ProgressDialog mProgressDialog;
 
 
     @BindView(R.id.bigimage)ImageView imageView;
     @BindView(R.id.toolbar)Toolbar toolbar;
 
-    public static ImageViewerFragment newInstance(long id, String url) {
+    public static ImageViewerFragment newInstance(long id, String url, String urlO) {
 
         Bundle args = new Bundle();
         args.putLong(ARG_PARAM1, id);
         args.putString(ARG_PARAM2, url);
-
+        args.putString(ARG_PARAM3, urlO);
         ImageViewerFragment fragment = new ImageViewerFragment();
         fragment.setArguments(args);
         return fragment;
@@ -76,7 +84,7 @@ public class ImageViewerFragment extends BaseBackFragment {
         if (getArguments() != null) {
             id = getArguments().getLong(ARG_PARAM1);
             url = getArguments().getString(ARG_PARAM2);
-
+            urlO = getArguments().getString(ARG_PARAM3);
 
         }
 
@@ -105,11 +113,26 @@ public class ImageViewerFragment extends BaseBackFragment {
                 switch (item.getItemId()) {
                     case R.id.action_share:
                         Intent share = new Intent(Intent.ACTION_SEND);
-                        share.setType("image/*");
-                        ByteArrayOutputStream bytes = new ByteArrayOutputStream();
 
-                        share.putExtra(Intent.EXTRA_STREAM, Uri.fromFile(new File(url)));
+
+                        if (URLUtil.isHttpsUrl(urlO) || URLUtil.isHttpUrl(urlO)) {
+                            share.setType("text/plain");
+                            share.putExtra(Intent.EXTRA_TEXT, urlO);
+                        }else{
+                            share.setType("image/*");
+                            share.putExtra(Intent.EXTRA_STREAM, Uri.fromFile(new File(url)));
+                        }
+
                         startActivity(Intent.createChooser(share, "Share Image"));
+                        break;
+
+                    case R.id.action_download:
+                        if (URLUtil.isHttpsUrl(urlO) || URLUtil.isHttpUrl(urlO)) {
+                            ImageUtils.file_download(getActivity(),urlO );
+                        }else{
+                            Toast.makeText(getActivity(), R.string.file_notworking, Toast.LENGTH_LONG).show();
+                        }
+
                         break;
                 }
                 return true;
@@ -120,21 +143,56 @@ public class ImageViewerFragment extends BaseBackFragment {
     }
 
     private void initView() {
-        File imageFile = new File(url);
-
+        mProgressDialog = ProgressDialog.show(getActivity(),
+                "", getResources().getString(R.string.loading_image)); //$NON-NLS-1$ //$NON-NLS-2$
+        mProgressDialog.setCancelable(false);
 
         mAttacher = new PhotoViewAttacher(imageView);
-        Picasso.with(getActivity()).load(imageFile).fit().centerInside().into(imageView, new Callback() {
-            @Override
-            public void onSuccess() {
-                mAttacher.update();
-            }
 
-            @Override
-            public void onError() {
 
-            }
-        });
+        if (URLUtil.isHttpsUrl(urlO) || URLUtil.isHttpUrl(urlO)) {
+            //is url
+            Picasso.with(getActivity()).load(urlO).fit().centerInside().into(imageView, new Callback() {
+                @Override
+                public void onSuccess() {
+                    mAttacher.update();
+                    if (mProgressDialog != null) {
+                        mProgressDialog.dismiss();
+                    }
+                }
+
+                @Override
+                public void onError() {
+                    if (mProgressDialog != null) {
+                        mProgressDialog.dismiss();
+                    }
+                }
+            });
+
+        }else{
+            File imageFile = new File(url);
+
+            Picasso.with(getActivity()).load(imageFile).fit().centerInside().into(imageView, new Callback() {
+                @Override
+                public void onSuccess() {
+                    mAttacher.update();
+                    if (mProgressDialog != null) {
+                        mProgressDialog.dismiss();
+                    }
+                }
+
+                @Override
+                public void onError() {
+                    if (mProgressDialog != null) {
+                        mProgressDialog.dismiss();
+                    }
+                }
+            });
+
+        }
+
+
+
 
 
 

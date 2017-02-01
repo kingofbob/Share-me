@@ -8,13 +8,23 @@ public class GalleryImageObject {
     private long id;
     private String title;
     private String uri;
+    private String uriO;
     private boolean selected;
 
-    public GalleryImageObject(long id, String title, String uri, boolean selected) {
+    public GalleryImageObject(long id, String title, String uri,String uriO, boolean selected) {
         this.id = id;
         this.title = title;
         this.uri = uri;
+        this.uriO = uriO;
         this.selected = selected;
+    }
+
+    public String getUriO() {
+        return uriO;
+    }
+
+    public void setUriO(String uriO) {
+        this.uriO = uriO;
     }
 
     public long getId() {

@@ -2,16 +2,25 @@ package com.soongwei.shareme.objects;
 
 public class PhonePhoto {
 
-    private int id;
+    private Long id;
     private String albumName;
     private String photoUri;
+    private String photoOriginalUri;
 
-    public int getId() {
+    public Long getId() {
         return id;
     }
 
-    public void setId( int id ) {
+    public void setId(Long id) {
         this.id = id;
+    }
+
+    public String getPhotoOriginalUri() {
+        return photoOriginalUri;
+    }
+
+    public void setPhotoOriginalUri(String photoOriginalUri) {
+        this.photoOriginalUri = photoOriginalUri;
     }
 
     public String getAlbumName() {

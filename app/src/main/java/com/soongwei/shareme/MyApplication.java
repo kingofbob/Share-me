@@ -3,8 +3,6 @@ package com.soongwei.shareme;
 import android.app.Application;
 import android.content.Context;
 
-import com.soongwei.shareme.apis.FlickrClient;
-
 public class MyApplication extends Application {
 	private static Context context;
 	
@@ -14,8 +12,5 @@ public class MyApplication extends Application {
         MyApplication.context = this;
 
     }
-    
-    public static FlickrClient getRestClient() {
-    	return (FlickrClient) FlickrClient.getInstance(FlickrClient.class, MyApplication.context);
-    }
+
 }

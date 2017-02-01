@@ -6,6 +6,7 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.webkit.URLUtil;
 import android.widget.BaseAdapter;
 import android.widget.FrameLayout;
 import android.widget.ImageView;
@@ -84,16 +85,32 @@ public class GalleryImageAdapter extends BaseAdapter {
             viewHolder.frameLayout.setBackgroundResource(R.color.colorPrimeBackground);
         }
 
-        File imageFile = new File(galleryImageObject.getUri());
-        Picasso.with(context)
-                .load(imageFile)
-                .placeholder(R.drawable.placeholder)
+       if (URLUtil.isHttpsUrl(galleryImageObject.getUri()) || URLUtil.isHttpUrl(galleryImageObject.getUri())){
+           //is url
+
+           Picasso.with(context)
+                   .load(galleryImageObject.getUri().replace("{s}", "q"))
+                   .placeholder(R.drawable.placeholder)
 //                .error()
-                .noFade()
-                .resize(250, 250)
-                .transform(new RoundedTransformation(5, 0))
-                .centerCrop()
-                .into(viewHolder.imageView);
+                   .noFade()
+                   .resize(250, 250)
+                   .transform(new RoundedTransformation(5, 0))
+                   .centerCrop()
+                   .into(viewHolder.imageView);
+       }else{
+           File imageFile = new File(galleryImageObject.getUri());
+           Picasso.with(context)
+                   .load(imageFile)
+                   .placeholder(R.drawable.placeholder)
+//                .error()
+                   .noFade()
+                   .resize(250, 250)
+                   .transform(new RoundedTransformation(5, 0))
+                   .centerCrop()
+                   .into(viewHolder.imageView);
+       }
+
+
 
 
         return convertView;
